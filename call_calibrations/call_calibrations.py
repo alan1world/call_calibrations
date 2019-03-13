@@ -1,11 +1,13 @@
 #! /usr/bin/env python
 #! -*- coding: utf-8 -*-
 
-from PyQt5 import QtWidgets, QtGui, QtCore
 from datetime import datetime
+from statistics import mean, StatisticsError
+
+from PyQt5 import QtWidgets, QtGui, QtCore
+
 from calibrations_sql import CalibrationStore
 from calibration_new import CalibrationAddNew
-from statistics import mean, StatisticsError
 
 class CallCalibrationMain(QtWidgets.QMainWindow):
 

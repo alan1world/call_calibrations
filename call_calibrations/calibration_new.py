@@ -2,9 +2,11 @@
 #! -*- coding: utf-8 -*-
 
 from datetime import datetime
-from PyQt5 import QtWidgets, QtGui, QtCore
-from calibrations_sql import CalibrationStore
 from functools import partial
+
+from PyQt5 import QtWidgets, QtGui, QtCore
+
+from calibrations_sql import CalibrationStore
 
 class CalibrationAddNew(QtWidgets.QDialog):
     
