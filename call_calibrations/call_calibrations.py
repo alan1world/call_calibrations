@@ -8,6 +8,7 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 
 from calibrations_sql import CalibrationStore
 from calibration_new import CalibrationAddNew
+from calibrations_export_summary import CalibrationExportSummary
 
 class CallCalibrationMain(QtWidgets.QMainWindow):
 
@@ -49,11 +50,28 @@ class CallCalibrationMain(QtWidgets.QMainWindow):
         fboxFilters.addRow("Month", self.monthFilter)
         fboxFilters.addRow("Week", self.weekFilter)
 
+        fboxAnswers = QtWidgets.QFormLayout()
+        fboxAnswers.setLabelAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)
+        #fboxAnswers.setFormAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)
+        self.scoreLabel = QtWidgets.QLabel()
+        self.fcrLabel = QtWidgets.QLabel()
+        self.interactLabel = QtWidgets.QLabel()
+        self.communicationLabel = QtWidgets.QLabel()
+        self.focusLabel = QtWidgets.QLabel()
+        self.attitudeLabel = QtWidgets.QLabel()
+        fboxAnswers.addRow("Overall:", self.scoreLabel)
+        fboxAnswers.addRow("First contact resolution:", self.fcrLabel)
+        fboxAnswers.addRow("Interaction Flow:", self.interactLabel)
+        fboxAnswers.addRow("Communication:", self.communicationLabel)
+        fboxAnswers.addRow("Customer Focus && Consultative Approach:", self.focusLabel)
+        fboxAnswers.addRow("Appropriate Attitude && Demeanor:", self.attitudeLabel)
+
         self.tableView = QtWidgets.QTableView()
         self.tableView.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         #spacer = QtWidgets.QSpacerItem(100,10)
 
         hbox_top_panel.addLayout(fboxFilters)
+        hbox_top_panel.addLayout(fboxAnswers)
         hbox_top_panel.addStretch()
         #hbox_top_panel.addItem(spacer)
         hbox_top_panel.addLayout(vbox_button_panel)
@@ -84,7 +102,8 @@ class CallCalibrationMain(QtWidgets.QMainWindow):
             #self.weekFilter.addItem('Week ' + str(counter))
         #self.weekFilter.addItems(('01', '02','03', '04', '05', '06', '07'))
         
-        self.calibrationModel = QtGui.QStandardItemModel()
+        self.calibrationModel = ScoreModel()
+        # self.calibrationModel = QtGui.QStandardItemModel()
         self.update_table()
         
         addnew_button.clicked.connect(self.call_add_new_agent)
@@ -192,14 +211,22 @@ class CallCalibrationMain(QtWidgets.QMainWindow):
             self.calibration_summary['demeanor'] = mean([ int(row[9]) for row in input_list if row[9] != None ])
         except StatisticsError:
             self.calibration_summary['demeanor'] = 0
-        print('------')
-        print('Overall: ' + f"{int(self.calibration_summary['overall']):02d}")
-        print('First contact resolution: ' + f"{int(self.calibration_summary['firstcontact']):02d}")
-        print('Interaction Flow: ' + f"{int(self.calibration_summary['interactionflow']):02d}")
-        print('Communication: ' + f"{int(self.calibration_summary['communication']):02d}")
-        print('Customer Focus & Consultative Approach: ' + f"{int(self.calibration_summary['customerfocus']):02d}")
-        print('Appropriate Attitude & Demeanor: ' + f"{int(self.calibration_summary['demeanor']):02d}")
-        print('------')
+        
+        self.scoreLabel.setText(f"{int(self.calibration_summary['overall']):02d}")
+        self.fcrLabel.setText(f"{int(self.calibration_summary['firstcontact']):02d}")
+        self.interactLabel.setText(f"{int(self.calibration_summary['interactionflow']):02d}")
+        self.communicationLabel.setText(f"{int(self.calibration_summary['communication']):02d}")
+        self.focusLabel.setText(f"{int(self.calibration_summary['customerfocus']):02d}")
+        self.attitudeLabel.setText(f"{int(self.calibration_summary['demeanor']):02d}")
+        
+        #print('------')
+        #print('Overall: ' + f"{int(self.calibration_summary['overall']):02d}")
+        #print('First contact resolution: ' + f"{int(self.calibration_summary['firstcontact']):02d}")
+        #print('Interaction Flow: ' + f"{int(self.calibration_summary['interactionflow']):02d}")
+        #print('Communication: ' + f"{int(self.calibration_summary['communication']):02d}")
+        #print('Customer Focus & Consultative Approach: ' + f"{int(self.calibration_summary['customerfocus']):02d}")
+        #print('Appropriate Attitude & Demeanor: ' + f"{int(self.calibration_summary['demeanor']):02d}")
+        #print('------')
         
     def call_filter(self):
         self.update_table()
@@ -219,7 +246,10 @@ class CallCalibrationMain(QtWidgets.QMainWindow):
         pass
 
     def act_export_weekly_score(self):
-        pass
+        self.hide()
+        output_result = []
+        output_result = CalibrationExportSummary.getCalibrationDetails()
+        self.show()
 
     def act_toggle_site(self):
         pass
@@ -232,6 +262,19 @@ class CallCalibrationMain(QtWidgets.QMainWindow):
                   statusTip="Export weekly score", triggered=self.act_export_weekly_score)
         self.toggle_site = QtWidgets.QAction("&Toggle site", self, 
                   statusTip="Toggle site", triggered=self.act_toggle_site)
+
+class ScoreModel(QtGui.QStandardItemModel):
+
+    def data(self, index, role=QtCore.Qt.DisplayRole):
+        if role == QtCore.Qt.TextAlignmentRole:
+            if index.column() in (0,1,3,5,6,7,8,9,10,12,13,14,15,16,17):
+                #return QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop
+                return QtCore.Qt.AlignCenter
+            elif index.column() == 11:
+                return QtCore.Qt.AlignTop
+            #else:
+                #return QtCore.Qt.AlignTop
+        return super(ScoreModel, self).data(index, role)
 
 def main():
     app = QtWidgets.QApplication([])

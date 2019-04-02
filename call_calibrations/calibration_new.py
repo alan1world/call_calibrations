@@ -2,7 +2,7 @@
 #! -*- coding: utf-8 -*-
 
 from datetime import datetime
-from functools import partial
+#from functools import partial
 
 from PyQt5 import QtWidgets, QtGui, QtCore
 
@@ -91,7 +91,9 @@ class CalibrationAddNew(QtWidgets.QDialog):
         #self.setTabOrder(self.calibrationEdit, self.feedback)
         self.feedback.setTabChangesFocus(True)
         for key in (QtCore.Qt.Key_Return, QtCore.Qt.Key_Enter):
-            QtWidgets.QShortcut(key, self, partial(self.focusNextPrevChild, True))
+            #QtWidgets.QShortcut(key, self, partial(self.focusNextPrevChild, True))
+            QtWidgets.QShortcut(key, self, self.focusNextChild)
+            #QtWidgets.QShortcut(key, self, partial(self.focusNextChild))
 
     def call_save(self):
         self.output['date'] = self.calibrationEdit.text()

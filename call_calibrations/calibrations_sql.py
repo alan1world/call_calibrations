@@ -146,6 +146,21 @@ class CalibrationStore():
                         (new_name, 'NK'))
             con.commit()
 
+    def export_weekly_score(self, year_in:str='2019', week_in:int=3):
+        con = sqlite3.connect(self.agentdb)
+        with con:
+            cur = con.cursor()
+            cur.execute(f"SELECT AVG(cc.score), AVG(cc.InteractionFlow), "
+                        f"AVG(cc.FirstcontactResolution), AVG(cc.Communication), "
+                        f"AVG(cc.CustomerFocus), AVG(cc.Demeanor) "
+                        f"FROM call_calibrations AS cc "
+                        f"WHERE cc.week = {week_in} AND "
+                        f"strftime('%Y', cc.date_calibrated) = '{year_in}'")
+            answer = cur.fetchone()
+            #rows = cur.fetchall()
+            con.commit()
+            return answer
+
     #def weekly_breakdown(self):
 
         #con = sqlite3.connect(self.agentdb)
