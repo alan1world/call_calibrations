@@ -1,7 +1,8 @@
 #! /usr/bin/env python
 #! -*- coding: utf-8 -*-
 
-import sqlite3
+import sqlite3, copy, datetime
+
 from pathlib import Path
 
 class CalibrationStore():
@@ -129,7 +130,7 @@ class CalibrationStore():
             rows = cur.fetchall()
         return rows
 
-    def insert_pos(self, new_pos):
+    def insert_pos(self, new_pos) -> None:
 
         con = sqlite3.connect(self.agentdb)
         with con:
@@ -137,7 +138,7 @@ class CalibrationStore():
             cur.execute('INSERT OR IGNORE INTO point_of_sale (country) VALUES (?)', (new_pos,))
             con.commit()
     
-    def insert_agent(self, new_name):
+    def insert_agent(self, new_name) -> None:
 
         con = sqlite3.connect(self.agentdb)
         with con:
@@ -160,6 +161,23 @@ class CalibrationStore():
             #rows = cur.fetchall()
             con.commit()
             return answer
+
+    def insert_calibration(self, in_cal) -> None:
+        con = sqlite3.connect(self.agentdb)
+        new_cal = copy.deepcopy(in_cal)
+        cal_date = datetime.datetime.strptime(new_cal['date'],'%d/%m/%Y')
+        new_cal['week'] = cal_date.strftime('%V')
+        new_cal['agentid'] = -1
+        new_cal['pos'] = -1
+        with con:
+            cur = con.cursor()
+            table_listing = ('date_calibrated','week','agent','AgentName','point_of_sale','Flight','Hotel','Rail','Car','Score','FirstcontactResolution','InteractionFlow',
+                            'Communication','CustomerFocus','Demeanor','Feedback','ManagerReview','ReviewedwithManager','Coachingdate','Reviewdate')
+            cur.execute(f'INSERT OR IGNORE INTO call_calibrations {table_listing} VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', 
+                            (new_cal['date'],new_cal['week'],new_cal['agentid'],new_cal['agent'],new_cal['pos'],new_cal['flight'],new_cal['hotel'],new_cal['rail'],
+                             new_cal['car'],new_cal['score'],new_cal['firstcontact'],new_cal['interactionflow'],new_cal['communication'],new_cal['customerfocus'],
+                             new_cal['demeanor'],new_cal['feedback'],new_cal['managerreview'],new_cal['reviewedwithmanager'],new_cal['coaching'],new_cal['reviewdate']))
+            con.commit()
 
     #def weekly_breakdown(self):
 

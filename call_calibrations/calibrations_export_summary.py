@@ -4,6 +4,7 @@
 import itertools
 
 from PyQt5 import QtWidgets, QtGui, QtCore
+from openpyxl import Workbook
 
 from calibrations_sql import CalibrationStore
 
@@ -29,8 +30,8 @@ class CalibrationExportSummary(QtWidgets.QDialog):
 
         self.listWidget = QtWidgets.QListWidget()
         years = ('2019', '2018')
-        months = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 
-                  'Oct', 'Nov', 'Dec')
+        #months = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 
+        #          'Oct', 'Nov', 'Dec')
         #for element in itertools.product('2018','Jan'):
         for year in years:
             for month in range(1,53):
@@ -49,19 +50,39 @@ class CalibrationExportSummary(QtWidgets.QDialog):
 
     def export_window(self):
         ev = CalibrationStore()
-        for item in self.listWidget.selectedItems():
+        wb = Workbook()
+        ws = wb.active
+        ws['A1'] = 'Year:'
+        ws['A2'] = 'Week:'
+        ws['A3'] = 'Score:'
+        ws['A4'] = 'InteractionFlow:'
+        ws['A5'] = 'FirstcontactResolution:'
+        ws['A6'] = 'Communication:'
+        ws['A7'] = 'CustomerFocus:'
+        ws['A8'] = 'Demeanor:'
+        for position, item in enumerate(self.listWidget.selectedItems(),2):
             first, second = item.text().split(' - Week ')
+            ws.cell(row=1,column=position, value=f'{first}')
+            ws.cell(row=2,column=position, value=f'{second}')
             print(f'Year: {first}, Week: {second}')
             export_answer = ev.export_weekly_score(year_in=first, week_in=int(second))
-            print(f"Score: {export_answer[0]:.1f}\n"
-                  f"InteractionFlow: {export_answer[1]:.1f}\n"
-                  f"FirstcontactResolution: {export_answer[2]:.1f}\n"
-                  f"Communication: {export_answer[3]:.1f}\n"
-                  f"CustomerFocus: {export_answer[4]:.1f}\n"
-                  f"Demeanor: {export_answer[5]:.1f}")
+            if export_answer[0] is not None:
+                ws.cell(row=3,column=position, value=f'{export_answer[0]:.1f}')
+                ws.cell(row=4,column=position, value=f'{export_answer[1]:.1f}')
+                ws.cell(row=5,column=position, value=f'{export_answer[2]:.1f}')
+                ws.cell(row=6,column=position, value=f'{export_answer[3]:.1f}')
+                ws.cell(row=7,column=position, value=f'{export_answer[4]:.1f}')
+                ws.cell(row=8,column=position, value=f'{export_answer[5]:.1f}')
+                print(f"Score: {export_answer[0]:.1f}\n"
+                    f"InteractionFlow: {export_answer[1]:.1f}\n"
+                    f"FirstcontactResolution: {export_answer[2]:.1f}\n"
+                    f"Communication: {export_answer[3]:.1f}\n"
+                    f"CustomerFocus: {export_answer[4]:.1f}\n"
+                    f"Demeanor: {export_answer[5]:.1f}")
         # Get list of selected  year / weeks
         # Send to database each year-week
         # Export list of results to output file
+        wb.save('export.xlsx')
         self.accept()
         
     def call_cancel(self):

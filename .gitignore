@@ -118,6 +118,7 @@ dmypy.json
 # Exclude databases and references
 /databases
 /references
+*.xlsx
 
 # Exclude sample files
 v0.1 agent_manager.py
