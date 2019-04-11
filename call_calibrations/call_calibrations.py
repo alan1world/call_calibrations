@@ -17,6 +17,8 @@ class CallCalibrationMain(QtWidgets.QMainWindow):
         super().__init__(parent=parent)
         self.calibration = CalibrationStore()
         self.calibration_summary = dict()
+        self.store_loc = 0
+        self.store_site_value = ""
         self.createActions()
         self.initUI()
         self.createMenus()
@@ -110,6 +112,18 @@ class CallCalibrationMain(QtWidgets.QMainWindow):
         save_button.clicked.connect(self.call_filter)
         cancel_button.clicked.connect(self.call_cancel)
 
+        self.tableView.selectionModel().selectionChanged.connect(self.change_display_result)
+
+    def change_display_result(self,selected,deselected):
+        index_entity = self.tableView.selectionModel().selectedIndexes()
+        self.store_loc = index_entity[0].row()
+        #print('Row number: ' + str(index_entity[0].row()))
+        self.store_site_value = self.calibrationModel.item(self.store_loc,3).text()
+        #print('Current value: ' + self.store_site_value)
+        #temp_entity = self.tableView.selectionModel().model()
+        #for index in sorted(index_entity):
+        #    print(str(temp_entity.data(index)))
+    
     def scores_menu(self, QPos):
         self.scoresMenu = QtWidgets.QMenu()
         # menu_item = self.linksMenu.addAction("Remove Item")
@@ -252,7 +266,16 @@ class CallCalibrationMain(QtWidgets.QMainWindow):
         self.show()
 
     def act_toggle_site(self):
-        pass
+        new_site = ""
+        if self.store_site_value == "NK":
+            new_site = "UK"
+        elif self.store_site_value == "UK":
+            new_site = "SA"
+        elif self.store_site_value == "SA":
+            new_site = "UK"
+        else:
+            new_site = "NK"
+        self.calibrationModel.setItem(self.store_loc,3,QtGui.QStandardItem(new_site))
 
     def createActions(self):
         
