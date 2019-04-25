@@ -62,17 +62,17 @@ class CalibrationExportSummary(QtWidgets.QDialog):
         ws['A8'] = 'Demeanor:'
         for position, item in enumerate(self.listWidget.selectedItems(),2):
             first, second = item.text().split(' - Week ')
-            ws.cell(row=1,column=position, value=f'{first}')
-            ws.cell(row=2,column=position, value=f'{second}')
+            ws.cell(row=1,column=position, value=int(first))
+            ws.cell(row=2,column=position, value=int(second))
             print(f'Year: {first}, Week: {second}')
             export_answer = ev.export_weekly_score(year_in=first, week_in=int(second))
             if export_answer[0] is not None:
-                ws.cell(row=3,column=position, value=f'{export_answer[0]:.1f}')
-                ws.cell(row=4,column=position, value=f'{export_answer[1]:.1f}')
-                ws.cell(row=5,column=position, value=f'{export_answer[2]:.1f}')
-                ws.cell(row=6,column=position, value=f'{export_answer[3]:.1f}')
-                ws.cell(row=7,column=position, value=f'{export_answer[4]:.1f}')
-                ws.cell(row=8,column=position, value=f'{export_answer[5]:.1f}')
+                ws.cell(row=3,column=position, value=int(export_answer[0]))
+                ws.cell(row=4,column=position, value=int(export_answer[1]))
+                ws.cell(row=5,column=position, value=int(export_answer[2]))
+                ws.cell(row=6,column=position, value=int(export_answer[3]))
+                ws.cell(row=7,column=position, value=int(export_answer[4]))
+                ws.cell(row=8,column=position, value=int(export_answer[5]))
                 print(f"Score: {export_answer[0]:.1f}\n"
                     f"InteractionFlow: {export_answer[1]:.1f}\n"
                     f"FirstcontactResolution: {export_answer[2]:.1f}\n"

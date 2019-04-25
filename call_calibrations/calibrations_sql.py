@@ -138,7 +138,7 @@ class CalibrationStore():
             cur.execute('INSERT OR IGNORE INTO point_of_sale (country) VALUES (?)', (new_pos,))
             con.commit()
     
-    def insert_agent(self, new_name) -> None:
+    def insert_agent(self, new_name:str) -> None:
 
         con = sqlite3.connect(self.agentdb)
         with con:
@@ -146,6 +146,15 @@ class CalibrationStore():
             cur.execute('INSERT OR IGNORE INTO agent_names (name, site) VALUES (?,?)', 
                         (new_name, 'NK'))
             con.commit()
+        
+    def get_agent_details(self, agent_name:str) -> tuple:
+        con = sqlite3.connect(self.agentdb)
+        with con:
+            cur = con.cursor()
+            cur.execute(f"SELECT rowid, name, site FROM agent_names WHERE name = '{agent_name}'")
+            answer = cur.fetchone()
+            con.commit()
+        return answer
 
     def export_weekly_score(self, year_in:str='2019', week_in:int=3):
         con = sqlite3.connect(self.agentdb)
@@ -160,7 +169,7 @@ class CalibrationStore():
             answer = cur.fetchone()
             #rows = cur.fetchall()
             con.commit()
-            return answer
+        return answer
 
     def insert_calibration(self, in_cal) -> None:
         con = sqlite3.connect(self.agentdb)

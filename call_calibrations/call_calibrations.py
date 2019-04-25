@@ -251,10 +251,18 @@ class CallCalibrationMain(QtWidgets.QMainWindow):
     def call_add_new_agent(self):
 
         self.hide()
-        new_agent = []
-        new_agent = CalibrationAddNew.getCalibrationDetails()
+        new_agent = {}
+        success_value = False
+        new_agent, success_value = CalibrationAddNew.getCalibrationDetails()
         self.show()
         print(new_agent)
+        print(str(success_value))
+        current_agent = new_agent['agent']
+        if new_agent['new_agent'] == True:
+            self.calibration.insert_agent(current_agent)
+        if success_value:
+            this_agent = self.calibration.get_agent_details(new_agent['agent'])
+            print(this_agent)
 
     def act_export_calibrations(self):
         pass
