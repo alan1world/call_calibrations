@@ -156,6 +156,15 @@ class CalibrationStore():
             con.commit()
         return answer
 
+    def get_pos_details(self, pos_name:str) -> tuple:
+        con = sqlite3.connect(self.agentdb)
+        with con:
+            cur = con.cursor()
+            cur.execute(f"SELECT rowid, country FROM point_of_sale WHERE country = '{pos_name}'")
+            answer = cur.fetchone()
+            con.commit()
+        return answer
+
     def export_weekly_score(self, year_in:str='2019', week_in:int=3):
         con = sqlite3.connect(self.agentdb)
         with con:

@@ -257,20 +257,30 @@ class CallCalibrationMain(QtWidgets.QMainWindow):
         self.show()
         print(new_agent)
         print(str(success_value))
-        current_agent = new_agent['agent']
-        if new_agent['new_agent'] == True:
-            self.calibration.insert_agent(current_agent)
+        #try:
+        #    current_agent = new_agent['agent']
+        #except KeyError:
+        #    return
+        #if success_value and new_agent['agent']:
         if success_value:
+            #if new_agent['agent'] == True:
+            #if new_agent['new_agent'] == True:
+                #Not necessary as insert is in the New form
+                #self.calibration.insert_agent(new_agent['agent'])
             this_agent = self.calibration.get_agent_details(new_agent['agent'])
             print(this_agent)
+            this_pos = self.calibration.get_pos_details(new_agent['pointofsale'])
+            print(this_pos)
+        self.update_table()
 
     def act_export_calibrations(self):
         pass
 
     def act_export_weekly_score(self):
         self.hide()
-        output_result = []
-        output_result = CalibrationExportSummary.getCalibrationDetails()
+        #output_result = []
+        #output_result = CalibrationExportSummary.getCalibrationDetails()
+        _ = CalibrationExportSummary.getCalibrationDetails()
         self.show()
 
     def act_toggle_site(self):
