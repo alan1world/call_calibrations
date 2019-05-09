@@ -185,14 +185,37 @@ class CalibrationStore():
         new_cal = copy.deepcopy(in_cal)
         cal_date = datetime.datetime.strptime(new_cal['date'],'%d/%m/%Y')
         new_cal['week'] = cal_date.strftime('%V')
-        new_cal['agentid'] = -1
-        new_cal['pos'] = -1
+        new_cal['out_date'] = cal_date.date()
+        try:
+            new_cal['agentid'] = self.get_agent_details(new_cal['agent'])[0]
+        except:
+            new_cal['agentid'] = -1
+        try:
+            new_cal['pos'] = self.get_pos_details(new_cal['pointofsale'])[0]
+        except:
+            new_cal['pos'] = -1
+        if new_cal['flight'] == 2:
+            new_cal['flight'] = 'Flight'
+        else:
+            new_cal['flight'] = None
+        if new_cal['hotel'] == 2:
+            new_cal['hotel'] = 'Hotel'
+        else:
+            new_cal['hotel'] = None
+        if new_cal['rail'] == 2:
+            new_cal['rail'] = 'Rail'
+        else:
+            new_cal['rail'] = None
+        if new_cal['car'] == 2:
+            new_cal['car'] = 'Car'
+        else:
+            new_cal['car'] = None
         with con:
             cur = con.cursor()
             table_listing = ('date_calibrated','week','agent','AgentName','point_of_sale','Flight','Hotel','Rail','Car','Score','FirstcontactResolution','InteractionFlow',
                             'Communication','CustomerFocus','Demeanor','Feedback','ManagerReview','ReviewedwithManager','Coachingdate','Reviewdate')
             cur.execute(f'INSERT OR IGNORE INTO call_calibrations {table_listing} VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', 
-                            (new_cal['date'],new_cal['week'],new_cal['agentid'],new_cal['agent'],new_cal['pos'],new_cal['flight'],new_cal['hotel'],new_cal['rail'],
+                            (new_cal['out_date'],new_cal['week'],new_cal['agentid'],new_cal['agent'],new_cal['pos'],new_cal['flight'],new_cal['hotel'],new_cal['rail'],
                              new_cal['car'],new_cal['score'],new_cal['firstcontact'],new_cal['interactionflow'],new_cal['communication'],new_cal['customerfocus'],
                              new_cal['demeanor'],new_cal['feedback'],new_cal['managerreview'],new_cal['reviewedwithmanager'],new_cal['coaching'],new_cal['reviewdate']))
             con.commit()

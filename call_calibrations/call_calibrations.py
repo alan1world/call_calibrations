@@ -271,6 +271,7 @@ class CallCalibrationMain(QtWidgets.QMainWindow):
             print(this_agent)
             this_pos = self.calibration.get_pos_details(new_agent['pointofsale'])
             print(this_pos)
+            self.calibration.insert_calibration(new_agent)
         self.update_table()
 
     def act_export_calibrations(self):
