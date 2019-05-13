@@ -112,7 +112,8 @@ class CalibrationStore():
                      f"CAST(cc.Demeanor AS text), "
                      f"cc.Feedback, cc.ManagerReview, cc.ReviewedwithManager, "
                      f"cc.Coachingdate, cc.Reviewdate, cc.Flight, "
-                     f"cc.Hotel, cc.Rail, cc.Car "
+                     f"cc.Hotel, cc.Rail, cc.Car,  "
+                     f"CAST(cc.rowid AS text) "
                      f"FROM call_calibrations AS cc "
                      f"INNER JOIN agent_names AS agn ON cc.agent = agn.ROWID "
                      f"INNER JOIN point_of_sale AS pos ON cc.point_of_sale = pos.ROWID "
@@ -146,7 +147,15 @@ class CalibrationStore():
             cur.execute('INSERT OR IGNORE INTO agent_names (name, site) VALUES (?,?)', 
                         (new_name, 'NK'))
             con.commit()
-        
+
+    def set_site(self, agent_name:str, new_site:str):
+        con = sqlite3.connect(self.agentdb)
+        with con:
+            cur = con.cursor()
+            cur.execute(f"UPDATE agent_names SET site='{new_site}' WHERE name = '{agent_name}'")
+            #answer = cur.fetchone()
+            con.commit()
+
     def get_agent_details(self, agent_name:str) -> tuple:
         con = sqlite3.connect(self.agentdb)
         with con:

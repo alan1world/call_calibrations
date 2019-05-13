@@ -4,7 +4,9 @@
 import itertools
 
 from PyQt5 import QtWidgets, QtGui, QtCore
+
 from openpyxl import Workbook
+import openpyxl.styles
 
 from calibrations_sql import CalibrationStore
 
@@ -52,18 +54,24 @@ class CalibrationExportSummary(QtWidgets.QDialog):
         ev = CalibrationStore()
         wb = Workbook()
         ws = wb.active
-        ws['A1'] = 'Year:'
-        ws['A2'] = 'Week:'
-        ws['A3'] = 'Score:'
-        ws['A4'] = 'InteractionFlow:'
-        ws['A5'] = 'FirstcontactResolution:'
-        ws['A6'] = 'Communication:'
-        ws['A7'] = 'CustomerFocus:'
-        ws['A8'] = 'Demeanor:'
+        collison_colours = {'white':'ffffff', 'magenta':'CE0058', 'red':'96172E', 'blue':'007DBA', 'dark_blue':'003865',
+                            'pink':'E89CAE', 'teal':'7CE0D3', 'grey':'4B4F54'}
+        collison_font = openpyxl.styles.Font(name='Calibri',size=11,bold=False,italic=False,vertAlign=None,underline='none',strike=False,color='ffffff')
+        collison_fill = openpyxl.styles.PatternFill(fill_type=None,start_color=collison_colours['magenta'],end_color=collison_colours['magenta'])
+        fixed_format_cells = (('A1','Year:'),('A2','Week:'),('A3','Score:'),('A4','InteractionFlow:'),('A5','FirstcontactResolution:'),
+                              ('A6','Communication:'),('A7','CustomerFocus:'),('A8','Demeanor:'))
+        for loc in fixed_format_cells:
+            ws[loc[0]] = loc[1]
+            ws[loc[0]].font = collison_font
+            ws[loc[0]].fill = collison_fill
         for position, item in enumerate(self.listWidget.selectedItems(),2):
             first, second = item.text().split(' - Week ')
             ws.cell(row=1,column=position, value=int(first))
             ws.cell(row=2,column=position, value=int(second))
+            ws.cell(row=1,column=position).font = collison_font
+            ws.cell(row=2,column=position).font = collison_font
+            ws.cell(row=1,column=position).fill = collison_fill
+            ws.cell(row=2,column=position).fill = collison_fill
             print(f'Year: {first}, Week: {second}')
             export_answer = ev.export_weekly_score(year_in=first, week_in=int(second))
             if export_answer[0] is not None:

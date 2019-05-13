@@ -19,6 +19,9 @@ class CallCalibrationMain(QtWidgets.QMainWindow):
         self.calibration_summary = dict()
         self.store_loc = 0
         self.store_site_value = ""
+        self.store_rowid = ""
+        self.store_agent = ""
+        #self.store_selection = None
         self.createActions()
         self.initUI()
         self.createMenus()
@@ -115,10 +118,14 @@ class CallCalibrationMain(QtWidgets.QMainWindow):
         self.tableView.selectionModel().selectionChanged.connect(self.change_display_result)
 
     def change_display_result(self,selected,deselected):
+        #self.store_selection = self.tableView.selectionModel()
         index_entity = self.tableView.selectionModel().selectedIndexes()
         self.store_loc = index_entity[0].row()
         #print('Row number: ' + str(index_entity[0].row()))
         self.store_site_value = self.calibrationModel.item(self.store_loc,3).text()
+        self.store_rowid = self.calibrationModel.item(self.store_loc,20).text()
+        self.store_agent = self.calibrationModel.item(self.store_loc,2).text()
+        #self.tableView.setSelectionModel = self.store_selection
         #print('Current value: ' + self.store_site_value)
         #temp_entity = self.tableView.selectionModel().model()
         #for index in sorted(index_entity):
@@ -129,7 +136,7 @@ class CallCalibrationMain(QtWidgets.QMainWindow):
         # menu_item = self.linksMenu.addAction("Remove Item")
         # menu_item = self.linksMenu.addAction(self.mark_viewed)
         self.scoresMenu.addAction(self.toggle_site)
-        self.scoresMenu.addAction(self.toggle_site)
+        #self.scoresMenu.addAction(self.toggle_site)
         parentPosition = self.tableView.mapToGlobal(QtCore.QPoint(0, 0))         
         self.scoresMenu.move(parentPosition + QPos)
         # self.linksMenu.move(QPos)
@@ -154,6 +161,7 @@ class CallCalibrationMain(QtWidgets.QMainWindow):
                                                         self.yearFilter.currentText(),
                                                         self.monthFilter.currentIndex(),
                                                         self.weekFilter.value())
+        #print(input_list[0])
         self.calibrationModel.clear()
         self.calibrationModel.setHorizontalHeaderLabels(('Week', 'Month', 'Agent', 'Site', 
                                                          'POS', 'Score', 'Interaction\nFlow',
@@ -163,7 +171,7 @@ class CallCalibrationMain(QtWidgets.QMainWindow):
                                                          'Manager\nReview', 
                                                          'Reviewed\nwith\nManager',
                                                          'Coaching\nDate', 'Review\nDate',
-                                                         'Flight', 'Hotel', 'Rail', 'Car',))
+                                                         'Flight', 'Hotel', 'Rail', 'Car', 'ID'))
         for row in input_list:
             row_list = []
             #row_list.append(QtGui.QStandardItem(row[0])) #date
@@ -188,6 +196,7 @@ class CallCalibrationMain(QtWidgets.QMainWindow):
             row_list.append(QtGui.QStandardItem(row[16])) # Hotel
             row_list.append(QtGui.QStandardItem(row[17])) # Rail
             row_list.append(QtGui.QStandardItem(row[18])) # Car
+            row_list.append(QtGui.QStandardItem(row[19])) # Rowid
             self.calibrationModel.appendRow(row_list)
         self.tableView.setModel(self.calibrationModel)
         self.tableView.resizeColumnsToContents()
@@ -295,6 +304,9 @@ class CallCalibrationMain(QtWidgets.QMainWindow):
         else:
             new_site = "NK"
         self.calibrationModel.setItem(self.store_loc,3,QtGui.QStandardItem(new_site))
+        self.calibration.set_site(self.store_agent,new_site)
+        #self.tableView.setSelectionModel = self.store_selection
+        #self.update_table()
 
     def createActions(self):
         
