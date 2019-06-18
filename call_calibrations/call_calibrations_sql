@@ -1,0 +1,32 @@
+BEGIN TRANSACTION;
+CREATE TABLE IF NOT EXISTS "call_calibrations" (
+	"date_calibrated"	TEXT,
+	"week"	INTEGER,
+	"agent"	INTEGER,
+	"AgentName"	TEXT,
+	"point_of_sale"	INTEGER,
+	"Flight"	TEXT,
+	"Hotel"	TEXT,
+	"Rail"	TEXT,
+	"Car"	TEXT,
+	"Score"	INTEGER,
+	"FirstcontactResolution"	INTEGER,
+	"InteractionFlow"	INTEGER,
+	"Communication"	INTEGER,
+	"CustomerFocus"	INTEGER,
+	"Demeanor"	INTEGER,
+	"Feedback"	TEXT,
+	"ManagerReview"	TEXT,
+	"ReviewedwithManager"	TEXT,
+	"Coachingdate"	TEXT,
+	"Reviewdate"	TEXT
+);
+CREATE TABLE IF NOT EXISTS "agent_names" (
+	"name"	TEXT NOT NULL UNIQUE,
+	"site"	TEXT NOT NULL,
+	PRIMARY KEY("name")
+);
+CREATE TABLE IF NOT EXISTS "point_of_sale" (
+	"country"	INTEGER
+);
+COMMIT;
